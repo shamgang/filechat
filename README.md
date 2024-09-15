@@ -14,6 +14,7 @@
     __queuestorage__
     __azurite_db*__.json
     ```
+1. ```npx shadcn@latest init -d```
 
 # Development setup
 1. Initialize local.settings.json
