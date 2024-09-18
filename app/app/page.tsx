@@ -1,4 +1,4 @@
-import { submitForm } from './FormHandler';
+import { serverFormHandler } from './FormHandler';
 import FilesForm from './FilesForm';
 
 export default function Home() {
@@ -16,7 +16,7 @@ export default function Home() {
           WARNING: This demo is not secure. Do not upload private information.
         </p>
         <br/>
-        <FilesForm submitForm={submitForm}/>
+        <FilesForm serverFormHandler={serverFormHandler}/>
       </div>
     </div>
   );

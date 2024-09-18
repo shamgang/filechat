@@ -10,7 +10,7 @@ import {
 export type FormHandler = (prevState: string | undefined, formData: FormData) => Promise<string | undefined>;
 
 // Server-side form handler that returns string in case of error.
-export const submitForm: FormHandler = async function (prevState, formData) {
+export const serverFormHandler: FormHandler = async function (prevState, formData) {
   'use server'
 
   console.info('Received form submission on server');
