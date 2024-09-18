@@ -1,15 +1,8 @@
+import { submitForm } from './FormHandler';
 import FilesForm from './FilesForm';
 
-interface HomeProps {
-  searchParams: { error?: string }
-}
+export default function Home() {
 
-export default function Home({ searchParams }: HomeProps) {
-  async function submitForm(formData: FormData) {
-    'use server'
-
-    console.log(formData);
-  }
   return (
     <div className="w-screen h-screen flex flex-col gap-4 items-center justify-center">
       <div className="size-11/12 md:w-3/4 lg:w-1/2 md:h-3/4 bg-slate-600 bg-opacity-50 rounded-sm p-10">
@@ -23,7 +16,7 @@ export default function Home({ searchParams }: HomeProps) {
           WARNING: This demo is not secure. Do not upload private information.
         </p>
         <br/>
-        <FilesForm submitForm={submitForm} error={searchParams.error}/>
+        <FilesForm submitForm={submitForm}/>
       </div>
     </div>
   );

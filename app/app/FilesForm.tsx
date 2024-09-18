@@ -1,43 +1,56 @@
 'use client'
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { ChangeEvent } from 'react';
+import { useFormState } from 'react-dom';
 import Image from 'next/image';
 import { FileUpIcon, XIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
-import { hasFolderId, uploadedFilesTooLarge, MAX_UPLOADED_FILE_SIZE_KB } from '@/lib/InputHelpers';
+import type { FormHandler } from './FormHandler';
+import {
+  hasFolderId,
+  uploadedFilesTooLarge,
+  MAX_UPLOADED_FILE_SIZE_KB
+} from '@/lib/InputHelpers';
 
-interface FilesFormProps {
-    submitForm: (formData: FormData) => void;
-    error?: string;
-}
-
-export default function FilesForm({ submitForm, error }: FilesFormProps) {
+export default function FilesForm({ submitForm }: { submitForm: FormHandler }) {
   const [driveUrl, setDriveUrl] = useState<string>('');
   const [files, setFiles] = useState<FileList | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [modified, setModified] = useState<boolean>(false);
+  const [serverValidationError, formAction] = useFormState<string | undefined, FormData>(submitForm, undefined);
+  const [modifiedSinceError, setModifiedSinceError] = useState<boolean>(false);
 
-  let displayError: string | undefined = modified ? undefined : error;
+  // Every time the server validation error updates, reset modifiedSinceError
+  useEffect(() => {
+    if (serverValidationError) {
+      console.info(`Got validation error from server: ${serverValidationError}`);
+    }
+    setModifiedSinceError(false);
+  }, [serverValidationError, setModifiedSinceError]);
+
+  // Clear the display error if modified, display it if not
+  let clientValidationError: string | undefined;
 
   const hasLink = driveUrl.length > 0;
   const hasValidLink = hasLink && hasFolderId(driveUrl);
   const hasFiles = !!(files && files.length > 0);
   const tooLarge = hasFiles && uploadedFilesTooLarge(files);
   if (tooLarge) {
-    displayError = `File size exceeded maximum of ${MAX_UPLOADED_FILE_SIZE_KB} KB`;
+    clientValidationError = `File size exceeded maximum of ${MAX_UPLOADED_FILE_SIZE_KB} KB`;
   }
   const hasValidFiles = hasFiles && !tooLarge;
   const readyToSubmit = hasValidLink || hasValidFiles;
 
-  if (displayError) {
-    console.info(`Displaying form validation error on client: ${displayError}`);
+  if (clientValidationError) {
+    console.info(`Got validation error on client: ${clientValidationError}`);
   }
 
+  const displayError: string | undefined = modifiedSinceError ? clientValidationError : serverValidationError
+
   return (
-    <form action={submitForm}>
+    <form action={formAction}>
       <div className="flex flex-row gap-5 items-center">
         <Image src="/img/google_drive_logo.png" alt="Google Drive folder URL" width={30} height={30} priority/>
         <Input
@@ -49,7 +62,7 @@ export default function FilesForm({ submitForm, error }: FilesFormProps) {
           disabled={hasFiles}
           onChange={
             (e: ChangeEvent<HTMLInputElement>) => {
-              setModified(true);
+              setModifiedSinceError(true);
               setDriveUrl(e.target.value);
             }
           }
@@ -69,7 +82,7 @@ export default function FilesForm({ submitForm, error }: FilesFormProps) {
           disabled={hasLink}
           onChange={
             (e: ChangeEvent<HTMLInputElement>) => {
-              setModified(true);
+              setModifiedSinceError(true);
               setFiles(e.target.files);
             }
           }
@@ -79,7 +92,7 @@ export default function FilesForm({ submitForm, error }: FilesFormProps) {
           <XIcon
             onClick={
               () => {
-                setModified(true);
+                setModifiedSinceError(true);
                 setFiles(null);
                 if (fileInputRef.current) {
                   fileInputRef.current.value = '';

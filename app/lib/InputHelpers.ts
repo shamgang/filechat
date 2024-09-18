@@ -31,7 +31,7 @@ export function hasFolderId(input: string): boolean {
   }
 }
 
-export function getFilesSize(files: FileList): number {
+export function getFilesSize(files: File[] | FileList): number {
   let totalSize = 0;
   for (let i = 0; i < files.length; i++) {
     totalSize += files[i].size;
@@ -41,7 +41,11 @@ export function getFilesSize(files: FileList): number {
 
 export const MAX_UPLOADED_FILE_SIZE_KB = parseInt(process.env.NEXT_PUBLIC_MAX_UPLOADED_FILE_SIZE_KB!);
 
-export function uploadedFilesTooLarge(files: FileList): boolean {
+export function uploadedFilesTooLarge(files: File[] | FileList): boolean {
   const maxSizeBytes = MAX_UPLOADED_FILE_SIZE_KB * 1024;
   return getFilesSize(files) > maxSizeBytes;
+}
+
+export function allFilesArePdf(files: File[] | FileList): boolean {
+  return Array.from(files).every(file => file.type === 'application/pdf');
 }
