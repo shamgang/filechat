@@ -15,6 +15,19 @@
     __azurite_db*__.json
     ```
 1. ```npx shadcn@latest init -d```
+1. In `.vscode/settings.json`, set `"css.validate": false`
+1. `npm init stylelint`
+1. Add the following stylelint rule:
+    ```
+    "rules": {
+      "at-rule-no-unknown": [
+        true,
+        {
+          "ignoreAtRules": ["tailwind"]
+        }
+      ]
+    }
+    ```
 
 # Development setup
 1. Initialize local.settings.json
@@ -46,6 +59,7 @@
 1. `cd app && npm install`
 1. Open Visual Studio with Azure Functions Core Tools installed
 1. Install the [Tailwind IntelliSense plugin](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss) and any others needed.
+1. Install the `vscode-stylelint` extension
 1. Import shadcn/ui components as needed:
     * `npx shadcn@latest add input`
     * `npx shadcn@latest add button`
