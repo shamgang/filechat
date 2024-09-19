@@ -1,7 +1,7 @@
 export class FolderIdNotFoundError extends Error {};
 
 // Return a string folder ID or false if not found.
-export function getFolderId(input: string): string | false {
+export function getFolderId(input: string): string {
   // Check if the string contains "drive.google.com/drive/folders"
   const googleDrivePattern = /drive\.google\.com\/drive\/.*folders\/([a-zA-Z0-9_-]{33})(?:[/?]|$)/;
   const alphanumeric33Pattern = /^[a-zA-Z0-9_-]{33}$/;
@@ -37,13 +37,6 @@ export function getFilesSize(files: File[] | FileList): number {
     totalSize += files[i].size;
   }
   return totalSize;
-}
-
-export const MAX_UPLOADED_FILE_SIZE_KB = parseInt(process.env.NEXT_PUBLIC_MAX_UPLOADED_FILE_SIZE_KB!);
-
-export function uploadedFilesTooLarge(files: File[] | FileList): boolean {
-  const maxSizeBytes = MAX_UPLOADED_FILE_SIZE_KB * 1024;
-  return getFilesSize(files) > maxSizeBytes;
 }
 
 export function allFilesArePdf(files: File[] | FileList): boolean {

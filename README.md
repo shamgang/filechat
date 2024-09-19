@@ -30,7 +30,7 @@
     ```
 
 # Development setup
-1. Initialize local.settings.json
+1. Initialize functions/local.settings.json
     ```
     {
         "IsEncrypted": false,
@@ -45,6 +45,7 @@
         }
     }
     ```
+1. Initialize app/.env.local with a value for `GOOGLE_DRIVE_API_KEY`
 1. Install [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli).
 1. Install the [Azure Web PubSub tunnel tool](https://learn.microsoft.com/en-us/azure/azure-web-pubsub/howto-web-pubsub-tunnel-tool?tabs=bash):
 
@@ -60,7 +61,7 @@
 1. Open Visual Studio with Azure Functions Core Tools installed
 1. Install the [Tailwind IntelliSense plugin](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss) and any others needed.
 1. Install the `vscode-stylelint` extension
-1. Import shadcn/ui components as needed:
+1. Import shadcn/ui components as needed (in `app` folder):
     * `npx shadcn@latest add input`
     * `npx shadcn@latest add button`
 
@@ -71,5 +72,5 @@
     awps-tunnel run --hub <hub> --endpoint https://<web pubsub name>.webpubsub.azure.com --upstream http://localhost:7071
     ```
 1. F1 -> Azurite: Start
-    * Make sure there is only one directory in the workspace or this will fail and you will have to manually start all 3 Azurite services.
+    * If there is more than one directory in the workspace you will have to manually start all 3 Azurite services by clicking them in the bottom bar and choosing the root folder of this project.
 1. F5 (Run and Debug)

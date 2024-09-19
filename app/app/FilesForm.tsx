@@ -8,11 +8,8 @@ import { FileUpIcon, XIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
-import {
-  hasFolderId,
-  uploadedFilesTooLarge,
-  MAX_UPLOADED_FILE_SIZE_KB
-} from '@/lib/InputHelpers';
+import { hasFolderId, getFilesSize } from '@/lib/InputHelpers';
+import { MAX_FILE_SIZE_KB } from '@/lib/Config';
 import type { FormHandler } from './FormHandler';
 import FormPendingListener from './FormPendingListener';
 
@@ -38,9 +35,9 @@ export default function FilesForm({ serverFormHandler }: { serverFormHandler: Fo
   const hasLink = driveUrl.length > 0;
   const hasValidLink = hasLink && hasFolderId(driveUrl);
   const hasFiles = !!(files && files.length > 0);
-  const tooLarge = hasFiles && uploadedFilesTooLarge(files);
+  const tooLarge = hasFiles && getFilesSize(files) > MAX_FILE_SIZE_KB * 1024;
   if (tooLarge) {
-    clientValidationError = `File size exceeded maximum of ${MAX_UPLOADED_FILE_SIZE_KB} KB`;
+    clientValidationError = `File size exceeded maximum of ${MAX_FILE_SIZE_KB} KB`;
   }
   const hasValidFiles = hasFiles && !tooLarge;
   const readyToSubmit = !pending && (hasValidLink || hasValidFiles);

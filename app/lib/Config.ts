@@ -1,0 +1,1 @@
+export const MAX_FILE_SIZE_KB = parseInt(process.env.NEXT_PUBLIC_MAX_FILE_SIZE_KB!);

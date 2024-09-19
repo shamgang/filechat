@@ -2,10 +2,10 @@ import {
   hasFolderId,
   getFolderId,
   allFilesArePdf,
-  uploadedFilesTooLarge,
-  MAX_UPLOADED_FILE_SIZE_KB,
   getFilesSize
 } from '@/lib/InputHelpers';
+import { folderSize } from '@/lib/GoogleDrive';
+import { MAX_FILE_SIZE_KB } from '@/lib/Config';
 
 export type FormHandler = (prevState: string | undefined, formData: FormData) => Promise<string | undefined>;
 
@@ -14,7 +14,6 @@ export const serverFormHandler: FormHandler = async function (prevState, formDat
   'use server'
 
   console.info('Received form submission on server');
-  console.info(formData);
 
   const files = formData.getAll('files') as File[];
   const fileSize = getFilesSize(files);
@@ -30,8 +29,8 @@ export const serverFormHandler: FormHandler = async function (prevState, formDat
     if (!allFilesArePdf(files)) {
       return 'Invalid non-PDF file type.';
     }
-    if (uploadedFilesTooLarge(files)) {
-      return `File size exceeded maximum of ${MAX_UPLOADED_FILE_SIZE_KB} KB`;
+    if (fileSize > MAX_FILE_SIZE_KB * 1024) {
+      return `File size exceeded maximum of ${MAX_FILE_SIZE_KB} KB`;
     }
     const filesLog = files.map(f => {
       return {
@@ -43,9 +42,13 @@ export const serverFormHandler: FormHandler = async function (prevState, formDat
     console.info(`Got files: ${JSON.stringify(filesLog)}`);
   } else {
     // Folder only
-    if (!hasFolderId(folderUrl as string)) {
+    if (!hasFolderId(folderUrl)) {
       return 'Invalid folder URL';
     }
-    console.info(`Got Google Drive folder: ${getFolderId(folderUrl as string)}`);
+    const folderId = getFolderId(folderUrl);
+    if (await folderSize(folderId) > MAX_FILE_SIZE_KB * 1024) {
+      return `Google Drive folder size exceeded maximum of ${MAX_FILE_SIZE_KB} KB`;
+    }
+    console.info(`Got Google Drive folder: ${folderId}`);
   }
 };
