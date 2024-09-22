@@ -4,12 +4,12 @@ import { useState, useRef, useEffect } from 'react';
 import type { ChangeEvent } from 'react';
 import { useFormState } from 'react-dom';
 import Image from 'next/image';
-import { FileUpIcon, XIcon } from 'lucide-react';
+import { FileUpIcon, XIcon, LoaderCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
 import { hasFolderId, getFilesSize } from '@/lib/InputHelpers';
-import { MAX_FILE_SIZE_KB } from '@/lib/Config';
+import { MAX_UPLOAD_SIZE_KB } from '@/lib/Config';
 import type { FormHandler } from './FormHandler';
 import FormPendingListener from './FormPendingListener';
 
@@ -35,9 +35,9 @@ export default function FilesForm({ serverFormHandler }: { serverFormHandler: Fo
   const hasLink = driveUrl.length > 0;
   const hasValidLink = hasLink && hasFolderId(driveUrl);
   const hasFiles = !!(files && files.length > 0);
-  const tooLarge = hasFiles && getFilesSize(files) > MAX_FILE_SIZE_KB * 1024;
+  const tooLarge = hasFiles && getFilesSize(files) > MAX_UPLOAD_SIZE_KB * 1000;
   if (tooLarge) {
-    clientValidationError = `File size exceeded maximum of ${MAX_FILE_SIZE_KB} KB`;
+    clientValidationError = `File size exceeded maximum of ${MAX_UPLOAD_SIZE_KB} KB`;
   }
   const hasValidFiles = hasFiles && !tooLarge;
   const readyToSubmit = !pending && (hasValidLink || hasValidFiles);
@@ -110,13 +110,18 @@ export default function FilesForm({ serverFormHandler }: { serverFormHandler: Fo
         )
       }
       <br/>
-      <Button
-        type="submit"
-        className="text-md md:text-lg bg-white text-black"
-        disabled={!readyToSubmit}
-      >
-        Load
-      </Button>
+      <div className="flex flex-row gap-5 items-center">
+        <Button
+          type="submit"
+          className="text-md md:text-lg bg-white text-black"
+          disabled={!readyToSubmit}
+        >
+          Load
+        </Button>
+        {
+          pending && <LoaderCircle className="animate-spin text-white"/>
+        }
+      </div>
       <FormPendingListener setPending={setPending}/>
     </form>      
   );
