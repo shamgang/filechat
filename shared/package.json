@@ -1,0 +1,35 @@
+{
+  "name": "ragapp-shared",
+  "version": "1.0.0",
+  "author": "Shamik Ganguly",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "exports": {
+    "./file-processing": {
+      "types": "./dist/file-processing/index.d.ts",
+      "default": "./dist/file-processing/index.js"
+    },
+    "./vector-store": {
+      "types": "./dist/vector-store/index.d.ts",
+      "default": "./dist/vector-store/index.js"
+    },
+    "./assistant": {
+      "types": "./dist/assistant/index.d.ts",
+      "default": "./dist/assistant/index.js"
+    }
+  },
+  "dependencies": {
+    "@azure/search-documents": "^12.1.0",
+    "@langchain/community": "^0.3.2",
+    "@langchain/core": "^0.3.3",
+    "@langchain/openai": "^0.3.0",
+    "langchain": "^0.3.2",
+    "pdf-parse": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/pdf-parse": "^1.1.4",
+    "typescript": "^5.6.2"
+  }
+}

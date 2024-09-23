@@ -1,0 +1,10 @@
+{
+  "name": "shamik-ragapp",
+  "version": "1.0.0",
+  "author": "Shamik Ganguly",
+  "workspaces": [
+    "app",
+    "functions",
+    "shared"
+  ]
+}

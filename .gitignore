@@ -1,3 +1,6 @@
+# Dependencies
+/node_modules
+
 # Azurite artifacts
 __blobstorage__
 __queuestorage__

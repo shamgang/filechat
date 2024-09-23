@@ -1,5 +1,3 @@
-import 'server-only'
-
 import { Document } from "@langchain/core/documents";
 import { OpenAIEmbeddings } from '@langchain/openai';
 import {
@@ -7,7 +5,7 @@ import {
   AzureAISearchQueryType
 } from '@langchain/community/vectorstores/azure_aisearch';
 
-import { loadPdf, splitDocuments } from './FileProcessing';
+import { loadPdf, splitDocuments } from '../file-processing';
 
 const ENDPOINT = process.env.AZURE_AISEARCH_ENDPOINT!;
 const INDEX_NAME = process.env.AZURE_AISEARCH_INDEX_NAME!;
@@ -29,6 +27,17 @@ function getVectorStore(): AzureAISearchVectorStore {
     }
   );
 }
+
+function getSessionFilter(sessionId: string): string {
+  return `metadata/attributes/any(a: a/key eq '${SESSION_ID_KEY}' and a/value eq '${sessionId}')`
+}
+
+export async function sessionExists(id: string): Promise<boolean> {
+  const results = await getVectorStore().similaritySearch('*', 1, {
+    filterExpression: getSessionFilter(id)
+  });
+  return results.length > 0;
+};
 
 async function documentExists(id: string): Promise<boolean> {
   const results = await getVectorStore().similaritySearch('*', 1, {
@@ -110,7 +119,7 @@ export async function search(sessionId: string, query: string): Promise<Document
     query,
     10,
     {
-      filterExpression: `metadata/attributes/any(a: a/key eq '${SESSION_ID_KEY}' and a/value eq '${sessionId}')`
+      filterExpression: getSessionFilter(sessionId)
     }
   );
   return results;

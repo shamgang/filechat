@@ -1,8 +1,6 @@
-import 'server-only';
-
 import { ChatOpenAI } from '@langchain/openai';
 
-import { search } from './VectorStore';
+import { search } from '../vector-store';
 
 export async function ask(sessionId: string, question: string): Promise<string> {
   const model = new ChatOpenAI({
@@ -26,5 +24,5 @@ export async function ask(sessionId: string, question: string): Promise<string> 
 
   const response = await model.invoke(prompt);
 
-  return JSON.stringify(response.content);
+  return response.content as string;
 }

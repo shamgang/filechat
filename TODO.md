@@ -1,9 +1,14 @@
 # High-priority
 
+* Vector store cleanup
+* Remote logging
+* Deployment
+* Accessibility
+
+# Medium-priority
+
 * Improve the assistant module - look into agentic flow / agents, assistants - some easy way to include chat history
 * Store chat history
-* Accessibility
-* Remote logging
 * Automated testing
 * Add Google Drive file metadata into vector store
 
@@ -16,3 +21,4 @@
 * Don't create Google Drive client in module root?
 * Azure AI search local emulator
 * Make Google Drive file download multi-threaded
+* MessageService failure in long-running browser - fails after "Starting client" and before "Client started" with "Websocket connection to _ failed" - handle

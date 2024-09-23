@@ -1,3 +1,5 @@
+import { redirect } from 'next/navigation';
+import { storePdfs } from 'ragapp-shared/vector-store';
 import {
   hasFolderId,
   getFolderId,
@@ -6,8 +8,6 @@ import {
 } from '@/lib/InputHelpers';
 import { folderSize, downloadFolder } from '@/lib/GoogleDrive';
 import { MAX_UPLOAD_SIZE_KB, MAX_CLOUD_FOLDER_SIZE_KB } from '@/lib/Config';
-import { storePdfs } from '@/lib/VectorStore';
-import { ask } from '@/lib/Assistant';
 
 class Form {
   private form: FormData;
@@ -107,6 +107,5 @@ export const serverFormHandler: FormHandler = async function (prevState, formDat
   await storePdfs(newSessionId, pdfs);
   console.info(`Files successfully indexed into session ${newSessionId}`);
 
-  const answer = await ask(newSessionId, 'Hello! Please respond with some information from the context.');
-  console.info(answer);
+  redirect(`/chat/${newSessionId}`);
 };
