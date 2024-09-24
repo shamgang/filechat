@@ -12,6 +12,9 @@ export default function Home() {
         <br/>
         <p className="text-white text-sm md:text-lg">
           Load a public Google Drive folder with Google Docs or PDFs, or upload PDFs.
+        </p>
+        <p className="text-white text-xs md:text-sm">
+          For this demo, documents are limited to 1MB and expire after 24 hours.
           <br/>
           WARNING: This demo is not secure. Do not upload private information.
         </p>

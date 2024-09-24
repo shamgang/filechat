@@ -14,7 +14,7 @@ export async function ask(sessionId: string, question: string): Promise<string> 
   const prompt = [
     {
       role: "system",
-      content: `You are a helpful assistant. Use the following context from the user's documents to help answer questions.\n\nContext: ${context}`,
+      content: `You are a helpful assistant. Use the following context from the user's files to help answer questions.\n\nContext: ${context}`,
     },
     {
       role: "user",

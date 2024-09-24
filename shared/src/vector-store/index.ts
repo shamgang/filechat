@@ -1,21 +1,39 @@
 import { Document } from "@langchain/core/documents";
 import { OpenAIEmbeddings } from '@langchain/openai';
-import {
-  AzureAISearchVectorStore,
-  AzureAISearchQueryType
-} from '@langchain/community/vectorstores/azure_aisearch';
+import { AzureAISearchQueryType } from '@langchain/community/vectorstores/azure_aisearch';
+import moment from 'moment';
 
 import { loadPdf, splitDocuments } from '../file-processing';
+import { AzureAISearchVectorStore, AdditionalMetadataFields } from '../ai-search';
+
 
 const ENDPOINT = process.env.AZURE_AISEARCH_ENDPOINT!;
 const INDEX_NAME = process.env.AZURE_AISEARCH_INDEX_NAME!;
 const ADMIN_KEY = process.env.AZURE_AISEARCH_KEY!;
 const MAX_INDEX_CHECK_RETRIES = 3;
 const INDEX_CHECK_SLEEP_MS = 1000;
-const SESSION_ID_KEY = 'sessionId';
 
-function getVectorStore(): AzureAISearchVectorStore {
-  return new AzureAISearchVectorStore(
+type AdditionalMetadata = {
+  sessionId: string,
+  timestamp: number
+};
+
+const additionalMetadataFields: AdditionalMetadataFields<AdditionalMetadata> = {
+  'sessionId': {
+    name: 'sessionId',
+    type: "Edm.String",
+    filterable: true,
+  },
+  'timestamp': {
+    name: 'timestamp',
+    type: "Edm.Int64",
+    filterable: true,
+    sortable: true,
+  }
+};
+
+function getVectorStore(): AzureAISearchVectorStore<AdditionalMetadata> {
+  return new AzureAISearchVectorStore<AdditionalMetadata>(
     new OpenAIEmbeddings(),
     {
       endpoint: ENDPOINT,
@@ -23,13 +41,14 @@ function getVectorStore(): AzureAISearchVectorStore {
       indexName: INDEX_NAME,
       search: {
         type: AzureAISearchQueryType.SimilarityHybrid
-      }
+      },
+      additionalMetadataFields: additionalMetadataFields
     }
   );
 }
 
 function getSessionFilter(sessionId: string): string {
-  return `metadata/attributes/any(a: a/key eq '${SESSION_ID_KEY}' and a/value eq '${sessionId}')`
+  return `metadata/sessionId eq '${sessionId}'`;
 }
 
 export async function sessionExists(id: string): Promise<boolean> {
@@ -76,9 +95,8 @@ export async function storePdf(sessionId: string, file: string | File): Promise<
     const docUuid = crypto.randomUUID();
     const docId = sessionId + '-' + docUuid;
     doc.id = docId;
-    doc.metadata.attributes = [
-      { key: SESSION_ID_KEY, value: sessionId }
-    ];
+    doc.metadata.sessionId = sessionId;
+    doc.metadata.timestamp = Date.now();
     return doc;
   });
   const docIds = docsWithMetadata.map(doc => doc.id!);
@@ -106,15 +124,7 @@ export async function storePdfs(sessionId: string, files: File[] | AsyncGenerato
 };
 
 export async function search(sessionId: string, query: string): Promise<Document[]> {
-  const vectorStore = new AzureAISearchVectorStore(
-    new OpenAIEmbeddings(),
-    {
-      indexName: INDEX_NAME,
-      search: {
-        type: AzureAISearchQueryType.SimilarityHybrid
-      }
-    }
-  );
+  const vectorStore = getVectorStore();
   const results = await vectorStore.similaritySearch(
     query,
     10,
@@ -123,4 +133,20 @@ export async function search(sessionId: string, query: string): Promise<Document
     }
   );
   return results;
+};
+
+export async function clean(): Promise<void> {
+  const lifetime = parseInt(process.env.DOCUMENT_LIFETIME_MIN!);
+  const now = moment();
+  const formatString = 'YYYY-MM-DD HH:mm:ss';
+  const threshold = now.clone().subtract(lifetime, 'minutes');
+  console.log(now);
+  console.log(formatString);
+  console.info(`Cleaning up at ${now.format(formatString)}. Deleting documents created before ${threshold.format(formatString)} (${lifetime} minutes ago)`);
+  const vectorStore = getVectorStore();
+  await vectorStore.delete({
+    filter: {
+      filterExpression: `metadata/timestamp lt ${threshold.valueOf()}`
+    }
+  });
 };

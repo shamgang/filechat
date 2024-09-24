@@ -46,7 +46,8 @@
             "OPENAI_CHAT_MODEL": "<model>",
             "AZURE_AISEARCH_KEY": "<adminKey>",
             "AZURE_AISEARCH_INDEX_NAME": "<indexName>",
-            "AZURE_AISEARCH_ENDPOINT": "<endpoint>"
+            "AZURE_AISEARCH_ENDPOINT": "<endpoint>",
+            "DOCUMENT_LIFETIME_MIN": 1440
         },
         "Host": {
             "LocalHttpPort": 7071,
