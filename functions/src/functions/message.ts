@@ -1,8 +1,8 @@
 import { app, trigger } from '@azure/functions';
 import { WebPubSubServiceClient } from '@azure/web-pubsub';
 import { ask } from 'ragapp-shared/assistant';
+import { logger } from 'ragapp-shared/logger';
 
-const logger = console;
 const wpsTrigger = trigger.generic({
   type: 'webPubSubTrigger',
   name: 'request',

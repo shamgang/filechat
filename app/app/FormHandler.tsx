@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { storePdfs } from 'ragapp-shared/vector-store';
+import { logger } from 'ragapp-shared/logger';
 import {
   hasFolderId,
   getFolderId,
@@ -11,6 +12,7 @@ import { MAX_UPLOAD_SIZE_KB, MAX_CLOUD_FOLDER_SIZE_KB } from '@/lib/Config';
 
 class Form {
   private form: FormData;
+  private _folderSize?: number;
 
   constructor(formData: FormData) {
     this.form = formData;
@@ -24,6 +26,10 @@ class Form {
     return (this.form.get('folderUrl') || '') as string;
   }
 
+  get folderId(): string {
+    return getFolderId(this.folderUrl);
+  }
+
   get fileSize(): number {
     return getFilesSize(this.files);
   }
@@ -34,6 +40,15 @@ class Form {
 
   get hasFolderUrl(): boolean {
     return this.folderUrl !== '';
+  }
+
+  async folderSize(): Promise<number> {
+    if (this._folderSize) {
+      return this._folderSize;
+    } else {
+      this._folderSize = await folderSize(this.folderId);
+      return this._folderSize;
+    }
   }
 
   // Returns a string if there is an error, otherwise nothing
@@ -57,8 +72,7 @@ class Form {
       if (!hasFolderId(this.folderUrl)) {
         return 'Invalid folder URL';
       }
-      const folderId = getFolderId(this.folderUrl);
-      if (await folderSize(folderId) > MAX_CLOUD_FOLDER_SIZE_KB * 1000) {
+      if (await this.folderSize() > MAX_CLOUD_FOLDER_SIZE_KB * 1000) {
         return `Google Drive folder size exceeded maximum of ${MAX_CLOUD_FOLDER_SIZE_KB} KB`;
       }
     }
@@ -71,14 +85,14 @@ export type FormHandler = (prevState: string | undefined, formData: FormData) =>
 export const serverFormHandler: FormHandler = async function (prevState, formData) {
   'use server'
 
-  console.info('Received form submission on server');
+  logger.info('Received form submission on server');
 
   const form = new Form(formData);
 
   const error = await form.validate();
 
   if (error) {
-    console.info(`Form validation failed on server: ${error}`);
+    logger.warn(`Form validation failed on server: ${error}`);
     return error;
   }
 
@@ -94,18 +108,17 @@ export const serverFormHandler: FormHandler = async function (prevState, formDat
         type: f.type
       }
     });
-    console.info(`Got files: ${JSON.stringify(filesLog)}`);
-    console.info(`Indexing file contents into new session ${newSessionId}`);
+    logger.info(`Got files: ${JSON.stringify(filesLog)} with total size ${form.fileSize}`);
+    logger.info(`Indexing file contents into new session ${newSessionId}`);
     pdfs = form.files;
   } else {
     // Folder only
-    const folderId = getFolderId(form.folderUrl)
-    console.info(`Got Google Drive folder: ${folderId}`);
-    pdfs = downloadFolder(folderId);
+    logger.info(`Got Google Drive folder: ${form.folderId} of size ${await form.folderSize()}`);
+    pdfs = downloadFolder(form.folderId);
   }
 
   await storePdfs(newSessionId, pdfs);
-  console.info(`Files successfully indexed into session ${newSessionId}`);
+  logger.info(`Files successfully indexed into session ${newSessionId}`);
 
   redirect(`/chat/${newSessionId}`);
 };

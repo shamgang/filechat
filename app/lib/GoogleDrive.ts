@@ -35,7 +35,6 @@ export async function* listFiles(folderId: string): AsyncGenerator<drive_v3.Sche
           file.mimeType === 'application/vnd.google-apps.document'
         ) {
           // Yield only if it's a PDF or Google Doc
-          console.log({size: file.size, name: file.name});
           yield file;
         }
       }
@@ -50,7 +49,6 @@ export async function folderSize(folderId: string): Promise<number> {
   for await (const file of listFiles(folderId)) {
     size += parseInt(file.size!);
   }
-  console.log(size);
   return size;
 };
 

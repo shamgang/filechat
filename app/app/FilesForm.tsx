@@ -5,6 +5,7 @@ import type { ChangeEvent } from 'react';
 import { useFormState } from 'react-dom';
 import Image from 'next/image';
 import { FileUpIcon, XIcon, LoaderCircle } from 'lucide-react';
+import { logger } from 'ragapp-shared/logger';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
@@ -24,7 +25,7 @@ export default function FilesForm({ serverFormHandler }: { serverFormHandler: Fo
   // Every time the server handler returns, reset modifiedSinceError
   useEffect(() => {
     if (serverValidationError) {
-      console.info(`Got validation error from server: ${serverValidationError}`);
+      logger.info(`Got validation error from server: ${serverValidationError}`);
     }
     setModifiedSinceError(false);
   }, [serverValidationError, setModifiedSinceError]);
@@ -43,7 +44,7 @@ export default function FilesForm({ serverFormHandler }: { serverFormHandler: Fo
   const readyToSubmit = !pending && (hasValidLink || hasValidFiles);
 
   if (clientValidationError) {
-    console.info(`Got validation error on client: ${clientValidationError}`);
+    logger.info(`Got validation error on client: ${clientValidationError}`);
   }
 
   const displayError: string | undefined = modifiedSinceError ? clientValidationError : serverValidationError

@@ -1,6 +1,6 @@
 import { app, input, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
 
-const logger = console;
+import { logger } from 'ragapp-shared/logger';
 
 const connection = input.generic({
     type: 'webPubSubConnection',

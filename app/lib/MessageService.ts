@@ -1,7 +1,7 @@
 import { OnServerDataMessageArgs, StartOptions, WebPubSubClient } from '@azure/web-pubsub-client';
 import { Mutex } from 'async-mutex';
 
-const logger = console;
+import { logger } from 'ragapp-shared/logger';
 
 async function getWebSocketUrl(): Promise<string> {
   const res = await fetch(process.env.NEXT_PUBLIC_API_HOST + '/api/negotiate');

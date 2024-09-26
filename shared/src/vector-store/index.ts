@@ -5,7 +5,7 @@ import moment from 'moment';
 
 import { loadPdf, splitDocuments } from '../file-processing';
 import { AzureAISearchVectorStore, AdditionalMetadataFields } from '../ai-search';
-
+import { logger } from "../logger";
 
 const ENDPOINT = process.env.AZURE_AISEARCH_ENDPOINT!;
 const INDEX_NAME = process.env.AZURE_AISEARCH_INDEX_NAME!;
@@ -77,7 +77,7 @@ async function waitForDocumentToExist(id: string): Promise<void> {
     if (await documentExists(id)) {
       return;
     }
-    console.info('Documents not indexed, retrying.');
+    logger.info('Documents not indexed, retrying.');
     if (numRetries >= MAX_INDEX_CHECK_RETRIES) {
       throw new IndexCheckTimeoutError('Index check timed out.');
     }
@@ -140,9 +140,7 @@ export async function clean(): Promise<void> {
   const now = moment();
   const formatString = 'YYYY-MM-DD HH:mm:ss';
   const threshold = now.clone().subtract(lifetime, 'minutes');
-  console.log(now);
-  console.log(formatString);
-  console.info(`Cleaning up at ${now.format(formatString)}. Deleting documents created before ${threshold.format(formatString)} (${lifetime} minutes ago)`);
+  logger.info(`Cleaning up at ${now.format(formatString)}. Deleting documents created before ${threshold.format(formatString)} (${lifetime} minutes ago)`);
   const vectorStore = getVectorStore();
   await vectorStore.delete({
     filter: {
