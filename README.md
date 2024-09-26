@@ -56,18 +56,21 @@
         }
     }
     ```
-1. Initialize app/.env.local with a value for `GOOGLE_DRIVE_API_KEY`, `AZURE_AISEARCH_KEY`, and `OPENAI_API_KEY`
 1. Install [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli).
 1. Install the [Azure Web PubSub tunnel tool](https://learn.microsoft.com/en-us/azure/azure-web-pubsub/howto-web-pubsub-tunnel-tool?tabs=bash):
 
     ```
     npm install -g @azure/web-pubsub-tunnel-tool
     ```
-1. In an Azure Web PubSub service instance, create a hub with an event handler with default settings. Set the URL Template to the following:
+1. In an Azure Web PubSub service instance, create a hub `filechat` with an event handler with default settings. Set the URL Template to the following:
 
     ```
     tunnel:///runtime/webhooks/webpubsub
     ```
+1. Create a an Azure AI search instance
+1. Create a dev App Insights instance (with corresponding dev Log Analytics workspace)
+1. Initialize app/.env.development.local with a value for `NEXT_PUBLIC_APP_INSIGHTS_CONN`
+1. Create app/.env.local with values for `GOOGLE_DRIVE_API_KEY`, `AZURE_AISEARCH_ENDPOINT`, `AZURE_AISEARCH_KEY`, and `OPENAI_API_KEY`
 1. `npm install`
 1. Open Visual Studio with Azure Functions Core Tools installed
 1. Install the [Tailwind IntelliSense plugin](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss) and any others needed.
@@ -84,3 +87,15 @@
 1. F5 (Run and Debug)
 1. In `app`, `npm run dev`
 1. Make sure to rebuild the `shared/` package with `npm run build` when changing it, or `npm run watch` to keep the `dist` folder updated. This may not register with the Next watcher, so you may need to restart Next.
+
+# Deployment
+1. Create a prod Web PubSub Service, a prod Application Insights instance (with corresponding Log Analytics workspace), and a prod storage account.
+1. Initialize app/.env.production.local with a value for `NEXT_PUBLIC_APP_INSIGHTS_CONN`
+1. TODO Create a function app and static web app from VScode
+1. TODO Take all environment variables in app/.env* and add them to the Static Web App environment variables as well as the Github Secrets, and add them to your Static Web App Github workflow
+1. TODO Take all environment variables in functions/local.settings.json and add them to the Function app environment variables
+1. On the function app, set `AzureWebJobsSecretStorageType` to `blob`. This will prevent the key that connects PubSub and the function app from re-generating on deployment.
+1. Note the `webpubsub_extension` key from Function -> App keys in the function app, create a hub `filechat` in the prod Web PubSub instance, and add an event handler with the following endpoint, replacing the the function app name and using the `webpubsub_extension` key:
+    ```
+    https://<FUNCTIONAPP_NAME>.azurewebsites.net/runtime/webhooks/webpubsub?code=<APP_KEY>
+    ```
