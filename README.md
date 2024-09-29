@@ -62,7 +62,7 @@
     ```
     npm install -g @azure/web-pubsub-tunnel-tool
     ```
-1. In an Azure Web PubSub service instance, create a hub `filechat` with an event handler with default settings. Set the URL Template to the following:
+1. In an Azure Web PubSub service instance, add the Web PubSub Service Owner role to your identity, and create a hub `filechat` with an event handler with default settings. Set the URL Template to the following:
 
     ```
     tunnel:///runtime/webhooks/webpubsub
@@ -91,6 +91,11 @@
 # Deployment
 1. Create a prod Web PubSub Service, a prod Application Insights instance (with corresponding Log Analytics workspace), and a prod storage account.
 1. Initialize app/.env.production.local with a value for `NEXT_PUBLIC_APP_INSIGHTS_CONN`
+1. F1 -> Azure Static Web Apps: Create a Static Web App. Specify `app` folder and `.next` build folder.
+1. Modify the generated workflow file to have an empty string for `api_location` and add an `env` key to the `steps` for the `build_and_deploy_job`. Add all environment variables from .env.production, .env.production.local, and .env.local as keys under `env`, and the value should be `${{ secrets.<variable_name> }}`. Do not include the actual value.
+1. Go to the Github repo, Settings -> Secrets and variables -> Actions and add all of the env variables as secrets.
+1. In Azure, move the new SWA into the correct resource group.
+1. Set all the same environment variables that were set in Github in the SWA as well.
 1. TODO Create a function app and static web app from VScode
 1. TODO Take all environment variables in app/.env* and add them to the Static Web App environment variables as well as the Github Secrets, and add them to your Static Web App Github workflow
 1. TODO Take all environment variables in functions/local.settings.json and add them to the Function app environment variables

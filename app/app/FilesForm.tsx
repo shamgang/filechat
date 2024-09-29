@@ -5,7 +5,7 @@ import type { ChangeEvent } from 'react';
 import { useFormState } from 'react-dom';
 import Image from 'next/image';
 import { FileUpIcon, XIcon, LoaderCircle } from 'lucide-react';
-import { logger } from 'ragapp-shared/logger';
+import { logger } from 'filechat-shared/logger';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 

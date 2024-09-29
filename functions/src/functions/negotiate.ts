@@ -1,11 +1,11 @@
 import { app, input, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
 
-import { logger } from 'ragapp-shared/logger';
+import { logger } from 'filechat-shared/logger';
 
 const connection = input.generic({
     type: 'webPubSubConnection',
     name: 'connection',
-    hub: 'ragapp'
+    hub: 'filechat'
 });
 
 app.http('negotiate', {

@@ -1,7 +1,7 @@
 import { app, InvocationContext, Timer } from '@azure/functions';
 
-import { clean } from 'ragapp-shared/vector-store';
-import { logger } from 'ragapp-shared/logger';
+import { clean } from 'filechat-shared/vector-store';
+import { logger } from 'filechat-shared/logger';
 
 export async function cleanup(myTimer: Timer, context: InvocationContext): Promise<void> {
     logger.info(`Cleanup running`);

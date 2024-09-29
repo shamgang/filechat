@@ -13,7 +13,7 @@
   "dependencies": {
     "@azure/functions": "^4.0.0",
     "@azure/web-pubsub": "^1.1.3",
-    "ragapp-shared": "^1.0.0"
+    "filechat-shared": "file:../shared"
   },
   "devDependencies": {
     "@types/node": "^20.x",

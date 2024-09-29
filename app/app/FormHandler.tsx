@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
-import { storePdfs } from 'ragapp-shared/vector-store';
-import { logger } from 'ragapp-shared/logger';
+import { storePdfs } from 'filechat-shared/vector-store';
+import { logger } from 'filechat-shared/logger';
 import {
   hasFolderId,
   getFolderId,

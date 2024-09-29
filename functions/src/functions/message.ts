@@ -1,12 +1,12 @@
 import { app, trigger } from '@azure/functions';
 import { WebPubSubServiceClient } from '@azure/web-pubsub';
-import { ask } from 'ragapp-shared/assistant';
-import { logger } from 'ragapp-shared/logger';
+import { ask } from 'filechat-shared/assistant';
+import { logger } from 'filechat-shared/logger';
 
 const wpsTrigger = trigger.generic({
   type: 'webPubSubTrigger',
   name: 'request',
-  hub: 'ragapp',
+  hub: 'filechat',
   eventName: 'message',
   eventType: 'user'
 });
