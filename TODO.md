@@ -1,8 +1,7 @@
 # High-priority
 
-* Remote logging
-* Deployment
 * Accessibility
+* Prevent DOS from many sessions in one day by doing an index statistics check more often than daily
 
 # Medium-priority
 
@@ -24,4 +23,3 @@
 * MessageService failure in long-running browser - fails after "Starting client" and before "Client started" with "Websocket connection to _ failed" - handle
 * Lift environment variables out of libraries
 * Make the limits on the home page dynamic from env variables
-* Prevent DOS from many sessions in one day by doing an index statistics check more often than daily

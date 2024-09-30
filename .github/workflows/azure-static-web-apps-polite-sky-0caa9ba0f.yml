@@ -41,6 +41,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           AZURE_AISEARCH_INDEX_NAME: ${{ secrets.AZURE_AISEARCH_INDEX_NAME }}
           NEXT_PUBLIC_APP_INSIGHTS_CONN: ${{ secrets.NEXT_PUBLIC_APP_INSIGHTS_CONN }}
+          NEXT_PUBLIC_API_HOST: ${{ secrets.NEXT_PUBLIC_API_HOST }}
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'

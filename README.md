@@ -92,15 +92,21 @@
 1. Create a prod Web PubSub Service, a prod Application Insights instance (with corresponding Log Analytics workspace), and a prod storage account.
 1. Initialize app/.env.production.local with a value for `NEXT_PUBLIC_APP_INSIGHTS_CONN`
 1. F1 -> Azure Static Web Apps: Create a Static Web App. Specify `app` folder and `.next` build folder.
-1. Modify the generated workflow file to have an empty string for `api_location` and add an `env` key to the `steps` for the `build_and_deploy_job`. Add all environment variables from .env.production, .env.production.local, and .env.local as keys under `env`, and the value should be `${{ secrets.<variable_name> }}`. Do not include the actual value.
+1. Modify the generated workflow file to have an empty string for `api_location`, add `skip_api_build: true`, and add an `env` key to the `steps` for the `build_and_deploy_job`. Add an env var `CD_PIPELINE = true`, and add all environment variables from .env.production, .env.production.local, and .env.local, and the value should be `${{ secrets.<variable_name> }}`. Do not include the actual value.
 1. Go to the Github repo, Settings -> Secrets and variables -> Actions and add all of the env variables as secrets.
 1. In Azure, move the new SWA into the correct resource group.
 1. Set all the same environment variables that were set in Github in the SWA as well.
-1. TODO Create a function app and static web app from VScode
-1. TODO Take all environment variables in app/.env* and add them to the Static Web App environment variables as well as the Github Secrets, and add them to your Static Web App Github workflow
-1. TODO Take all environment variables in functions/local.settings.json and add them to the Function app environment variables
+1. Create a Node function app in azure connected to the prod storage account.
+1. In Authentication add a Microsoft identity provider with Allow unauthenticated access true.
+1. In Deployment Center add a Github deployment with Basic authentication
+1. Fix the generated workflow file, add a package path, add a `CD_PIPELINE = true` env variable in the resolve dependencies pipeline step. Change the build step to build-and-deploy, remove the upload and download steps, and move the function app step into the first job
+1. Take all environment variables in functions/local.settings.json and add them to the Function app environment variables with production values.
 1. On the function app, set `AzureWebJobsSecretStorageType` to `blob`. This will prevent the key that connects PubSub and the function app from re-generating on deployment.
-1. Note the `webpubsub_extension` key from Function -> App keys in the function app, create a hub `filechat` in the prod Web PubSub instance, and add an event handler with the following endpoint, replacing the the function app name and using the `webpubsub_extension` key:
+1. In the function app, ensure the API -> CORS Allowed Origins List includes the
+domain of the static web app, as well as any custom domains.
+1. Update the NEXT_PUBLIC_API_HOST variable in .env.production to include the https function app endpoint, and add to the static website workflow file, github secrets, and environment variables.
+1. Push to run both build and deployment workflows.
+1. After a successful deployment of the Function app, a webpubsub_extension key will be generated in Functions -> App keys. Take this and create a hub `filechat` in the prod Web PubSub instance, and add an event handler with the following endpoint, replacing the the function app name and using the key:
     ```
     https://<FUNCTIONAPP_NAME>.azurewebsites.net/runtime/webhooks/webpubsub?code=<APP_KEY>
     ```

@@ -8,7 +8,9 @@
     "clean": "rimraf dist",
     "prestart": "npm run clean && npm run build",
     "start": "func start",
-    "test": "echo \"No tests yet...\""
+    "test": "echo \"No tests yet...\"",
+    "preinstall": "cd ../shared && npm install && npm run build",
+    "postinstall": "node postinstall.js"
   },
   "dependencies": {
     "@azure/functions": "^4.0.0",
@@ -17,7 +19,8 @@
   },
   "devDependencies": {
     "@types/node": "^20.x",
-    "rimraf": "^5.0.0",
+    "fs-extra": "^11.2.0",
+    "rimraf": "^5.0.10",
     "typescript": "^4.0.0"
   },
   "main": "dist/src/{index.js,functions/*.js}",
