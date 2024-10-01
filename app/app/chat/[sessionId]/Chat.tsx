@@ -23,6 +23,7 @@ export default function Chat({ sessionId }: { sessionId: string }) {
   const [chatInputDisabled, setChatInputDisabled] = useState<boolean>(false);
   const waitingForResponse = useRef<boolean>(false);
   const messageService = useRef<MessageService>(new MessageService());
+  const scrollArea = useRef<HTMLDivElement>(null);
 
   const pushMessage = useCallback((message: Message): void => {
     setMessages(msgs => [...msgs, message]);
@@ -110,31 +111,44 @@ export default function Chat({ sessionId }: { sessionId: string }) {
     }
   }
 
+  // When the messages change, scroll to the bottom
+  useEffect(() => {
+    if (scrollArea.current) {
+      console.log('scrolling');
+      scrollArea.current.scrollTo({
+        top: scrollArea.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  }, [messages]);
+
   return (
-    <div className="w-screen h-screen flex flex-col gap-4 items-center justify-center">
-      <div className="size-11/12 md:w-3/4 lg:w-1/2 md:h-3/4 border border-gray-200 rounded-lg overflow-hidden shadow-lg flex flex-col">
+    <div className="w-screen h-dvh flex flex-col gap-4 items-center justify-center">
+      <div className="size-full md:w-3/4 lg:w-1/2 md:h-3/4 border border-gray-200 md:rounded-lg overflow-hidden md:shadow-lg flex flex-col">
         <div className="bg-white p-4">
           <h2 className="text-lg font-semibold text-gray-800">File Chat</h2>
         </div>
-        <ScrollArea className="flex-grow p-4 bg-gray-50">
-          {messages.map((message, idx) => (
-            <div
-              key={ 'msg-' + idx }
-              className={`mb-4 ${
-                message.sender === 'user' ? 'text-right' : 'text-left'
-              }`}
-            >
+        <ScrollArea viewportRef={scrollArea} className="flex-grow bg-gray-50">
+          <div className="p-4">
+            {messages.map((message, idx) => (
               <div
-                className={`inline-block p-2 rounded-lg text-left max-w-64 md:max-w-96 ${
-                  message.sender === 'user'
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200 text-gray-800'
+                key={ 'msg-' + idx }
+                className={`mb-4 ${
+                  message.sender === 'user' ? 'text-right' : 'text-left'
                 }`}
               >
-                {message.text}
+                <div
+                  className={`inline-block p-2 rounded-lg text-left max-w-64 md:max-w-96 ${
+                    message.sender === 'user'
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-200 text-gray-800'
+                  }`}
+                >
+                  {message.text}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </ScrollArea>
         <div className="p-4 bg-white border-t border-gray-200">
           <div className="flex space-x-2">
@@ -144,7 +158,7 @@ export default function Chat({ sessionId }: { sessionId: string }) {
               onChange={(e) => setInputMessage(e.target.value)}
               placeholder="Type your message..."
               onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-              className="flex-grow"
+              className="flex-grow text-base"
               disabled={chatInputDisabled}
             />
             <Button onClick={handleSendMessage}>Send</Button>
