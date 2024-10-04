@@ -11,6 +11,7 @@
 * Automated testing
 * Add Google Drive file metadata into vector store
 * Make a PR to langchainjs/libs/langchain-community/src/vectorstores/azure_aisearch.ts to make it more extensible for different index fields and document formats, and allow ordering, etc.
+* Open graph data
 
 # Low-priority
 
