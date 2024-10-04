@@ -4,11 +4,10 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { logger } from 'filechat-shared/logger';
 
 import type { ServerMessage } from '@/lib/MessageService';
 import { MessageService } from '@/lib/MessageService';
-
-const logger = console;
 
 interface Message {
   text: string,
@@ -49,16 +48,19 @@ export default function Chat({ sessionId }: { sessionId: string }) {
   }, [setMessages]);
 
   const onServerMessage = useCallback((msg: ServerMessage): void => {
-    if (msg.error) {
-      pushMessage({ text: msg.error, sender: 'assistant'});
-    } else if (msg.responseChunk) {
+    if (msg.error || msg.responseChunk) {
       if (waitingForResponse.current) {
         waitingForResponse.current = false;
-        // Replace loading message with a new empty message to animate into
+        // Replace loading message with a new empty message to add to
         popMessage();
         pushMessage({ text: '', sender: 'assistant'});
       }
-      appendToLastMessage(msg.responseChunk);
+      if (msg.error) {
+        logger.error(`Error from message handler: ${msg.error}`);
+        appendToLastMessage('Sorry, I ran into an error. Try refreshing the page.');
+      } else if (msg.responseChunk) {
+        appendToLastMessage(msg.responseChunk);
+      }
     } else if (msg.endResponse) {
       setChatInputDisabled(false);
     }
@@ -107,14 +109,24 @@ export default function Chat({ sessionId }: { sessionId: string }) {
       setChatInputDisabled(true);
       waitingForResponse.current = true;
 
-      messageService.current?.send(sessionId, msg);
+      (async () => {
+        try {
+          await messageService.current?.send(sessionId, msg);
+        } catch (error) {
+          logger.error('Error sending message.');
+          logger.error(error);
+          waitingForResponse.current = false;
+          // Replace loading message with error message
+          popMessage();
+          pushMessage({ text: 'Sorry, I ran into an error. Try refreshing the page.', sender: 'assistant'});
+        }
+      })();
     }
   }
 
   // When the messages change, scroll to the bottom
   useEffect(() => {
     if (scrollArea.current) {
-      console.log('scrolling');
       scrollArea.current.scrollTo({
         top: scrollArea.current.scrollHeight,
         behavior: 'smooth'

@@ -116,7 +116,6 @@ export const serverFormHandler: FormHandler = async function (prevState, formDat
     logger.info(`Got Google Drive folder: ${form.folderId} of size ${await form.folderSize()}`);
     pdfs = downloadFolder(form.folderId);
   }
-
   await storePdfs(newSessionId, pdfs);
   logger.info(`Files successfully indexed into session ${newSessionId}`);
 

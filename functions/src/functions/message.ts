@@ -32,13 +32,20 @@ type ClientMessage = {
 app.generic('message', {
   trigger: wpsTrigger,
   handler: async (request: WebPubSubRequest) => {
-    const message = JSON.parse(request.data) as ClientMessage;
     const connectionId = request.connectionContext.connectionId;
-    logger.info({ connectionId, message }, 'Message handler invoked.');
-    const answer = await ask(message.sessionId, message.messageText);
-    logger.info(answer);
     const client = new WebPubSubServiceClient(process.env.WebPubSubConnectionString, process.env.WEB_PUBSUB_HUB);
-    await client.sendToConnection(connectionId, { responseChunk: answer });
-    await client.sendToConnection(connectionId, { endResponse: true });
+    let message: ClientMessage;
+    try {
+      message = JSON.parse(request.data) as ClientMessage;
+      logger.info(`Message handler invoked for session id ${message.sessionId} and connection ${connectionId}.`);
+      const answer = await ask(message.sessionId, message.messageText);
+      logger.info(`Message handler sending response to session ${message.sessionId} and connection ${connectionId}.`);
+      await client.sendToConnection(connectionId, { responseChunk: answer });
+      await client.sendToConnection(connectionId, { endResponse: true });
+    } catch (error) {
+      logger.error(`Error in message handler for session ${message?.sessionId} and connection ${connectionId}.`);
+      logger.error(error);
+      await client.sendToConnection(connectionId, { error: error.message });
+    }
   }
 });
