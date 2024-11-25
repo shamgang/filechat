@@ -6,7 +6,7 @@ This is a proof-of-concept demo by Shamik Ganguly for bring-your-own-docs, publi
 
 ## Try it out
 
-[![demo-screenshot]](https://example.com)
+[![demo-screenshot]](https://filechat.shamgang.com)
 
 [https://filechat.shamgang.com](https://filechat.shamgang.com)
 
