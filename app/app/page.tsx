@@ -19,7 +19,8 @@ export default function Home() {
           WARNING: This demo is not secure. Do not upload private information.
         </p>
         <br/>
-        <FilesForm serverFormHandler={serverFormHandler}/>
+        <h1 style={{fontStyle: "italic"}}>THIS WEBSITE IS INDEFINITELY OFFLINE DUE TO INFRASTRUCTURE DEPRECATIONS</h1>
+        {/*<FilesForm serverFormHandler={serverFormHandler}/>*/}
       </div>
     </div>
   );
