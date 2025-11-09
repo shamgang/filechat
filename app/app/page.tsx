@@ -20,7 +20,7 @@ export default function Home() {
         </p>
         <br/>
         <h1 style={{fontStyle: "italic"}}>THIS WEBSITE IS INDEFINITELY OFFLINE DUE TO INFRASTRUCTURE DEPRECATIONS</h1>
-        {/*<FilesForm serverFormHandler={serverFormHandler}/>*/}
+        <FilesForm serverFormHandler={serverFormHandler}/>
       </div>
     </div>
   );
